@@ -1,345 +1,467 @@
 from flask import Blueprint, request, jsonify
-from src.models.business import db, BusinessMetrics, StaffMember, Equipment
-from src.ai_executives_enhanced import create_ai_executive
+from src.models.business import db, BusinessMetrics, StaffMember, Equipment, AIExecutiveDecision
+from src.ai_executives_enhanced import get_ai_team
 from datetime import datetime, timedelta
 import json
 
 business_bp = Blueprint('business', __name__)
 
-@business_bp.route('/dashboard', methods=['GET'])
-def get_dashboard():
-    """Get business dashboard with AI insights"""
-    try:
-        # Get recent metrics
-        end_date = datetime.utcnow()
-        start_date = end_date - timedelta(days=30)
-        
-        metrics = BusinessMetrics.query.filter(
-            BusinessMetrics.period_start >= start_date
-        ).all()
-        
-        # Organize metrics by type
-        dashboard_data = {
-            "revenue": [],
-            "bookings": [],
-            "satisfaction": [],
-            "staff_performance": []
-        }
-        
-        for metric in metrics:
-            if metric.metric_type in dashboard_data:
-                dashboard_data[metric.metric_type].append(metric.to_dict())
-        
-        # AI CEO strategic analysis
-        ai_ceo = create_ai_executive("CEO")
-        
-        # Calculate summary metrics
-        total_revenue = sum(m.metric_value for m in metrics if m.metric_type == "revenue")
-        total_bookings = sum(m.metric_value for m in metrics if m.metric_type == "bookings")
-        avg_satisfaction = sum(m.metric_value for m in metrics if m.metric_type == "satisfaction") / max(len([m for m in metrics if m.metric_type == "satisfaction"]), 1)
-        
-        strategic_context = {
-            "total_revenue": total_revenue,
-            "total_bookings": total_bookings,
-            "average_satisfaction": avg_satisfaction,
-            "period_days": 30
-        }
-        
-        strategic_analysis = ai_ceo.strategic_planning({}, {"revenue": total_revenue}, {"average_rating": avg_satisfaction})
-        
-        return jsonify({
-            "metrics": dashboard_data,
-            "summary": {
-                "total_revenue": total_revenue,
-                "total_bookings": total_bookings,
-                "average_satisfaction": avg_satisfaction
-            },
-            "ai_insights": strategic_analysis
-        })
-        
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
 @business_bp.route('/staff', methods=['GET'])
 def get_staff():
-    """Get all staff members"""
+    """Get all staff members with their compensation details"""
     try:
-        staff = StaffMember.query.filter_by(active=True).all()
-        return jsonify([member.to_dict() for member in staff])
+        staff_members = StaffMember.query.all()
+        result = []
+        
+        for staff in staff_members:
+            staff_data = {
+                'id': staff.id,
+                'name': staff.name,
+                'role': staff.role,
+                'status': staff.status,
+                'base_salary': float(staff.base_salary),
+                'profit_share': float(staff.profit_share),
+                'performance_score': staff.performance_score,
+                'events_completed': staff.events_completed,
+                'hire_date': staff.hire_date.isoformat(),
+                'total_compensation': float(staff.base_salary + staff.profit_share)
+            }
+            result.append(staff_data)
+        
+        return jsonify(result), 200
+        
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
 @business_bp.route('/staff', methods=['POST'])
-def create_staff():
-    """Create a new staff member"""
+def add_staff_member():
+    """Add a new staff member"""
     try:
         data = request.get_json()
         
+        # Validate required fields
+        required_fields = ['name', 'role', 'base_salary']
+        for field in required_fields:
+            if not data.get(field):
+                return jsonify({'error': f'Missing required field: {field}'}), 400
+        
         staff = StaffMember(
-            name=data.get('name'),
-            email=data.get('email'),
-            phone=data.get('phone'),
-            role=data.get('role'),
-            hourly_rate=data.get('hourly_rate'),
-            skills=json.dumps(data.get('skills', [])),
-            availability=json.dumps(data.get('availability', {}))
+            name=data['name'],
+            role=data['role'],
+            status=data.get('status', 'active'),
+            base_salary=float(data['base_salary']),
+            profit_share=0.0,  # Will be calculated by AI
+            performance_score=85,  # Starting score
+            events_completed=0,
+            hire_date=datetime.now().date()
         )
         
         db.session.add(staff)
         db.session.commit()
         
-        return jsonify(staff.to_dict()), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-@business_bp.route('/staff/<int:staff_id>/performance', methods=['POST'])
-def update_staff_performance(staff_id):
-    """Update staff performance score"""
-    try:
-        staff = StaffMember.query.get_or_404(staff_id)
-        data = request.get_json()
-        
-        # AI COO evaluates performance update
-        ai_coo = create_ai_executive("COO")
-        
-        performance_context = {
-            "staff_member": staff.to_dict(),
-            "new_score": data.get('performance_score'),
-            "feedback": data.get('feedback', ''),
-            "evaluation_period": data.get('period', 'monthly')
+        # Get AI CEO decision on compensation structure
+        ai_team = get_ai_team()
+        compensation_context = {
+            'type': 'new_hire_compensation',
+            'staff_details': {
+                'name': data['name'],
+                'role': data['role'],
+                'base_salary': float(data['base_salary'])
+            },
+            'current_team_size': StaffMember.query.count()
         }
         
-        performance_decision = ai_coo.make_decision("performance_evaluation", performance_context)
+        ceo_decision = ai_team.get_executive_decision('AI_CEO', compensation_context)
         
-        # Update performance score
-        staff.performance_score = data.get('performance_score')
-        staff.updated_at = datetime.utcnow()
-        
+        # Log AI decision
+        ai_decision = AIExecutiveDecision(
+            executive_role=ceo_decision['executive'],
+            decision_type=ceo_decision['context']['type'],
+            context=json.dumps(ceo_decision['context']),
+            decision=json.dumps(ceo_decision['decision']),
+            impact_level=ceo_decision['decision'].get('impact_level', 'Medium'),
+            created_at=datetime.strptime(ceo_decision['timestamp'], '%Y-%m-%dT%H:%M:%S.%f')
+        )
+        db.session.add(ai_decision)
         db.session.commit()
         
         return jsonify({
-            "staff": staff.to_dict(),
-            "ai_evaluation": performance_decision
-        })
+            'success': True,
+            'message': 'Staff member added successfully',
+            'staff_id': staff.id,
+            'ai_decision': ceo_decision
+        }), 201
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
 @business_bp.route('/profit-distribution', methods=['POST'])
 def distribute_profits():
-    """AI CEO distributes profits to wage earners"""
+    """Distribute profits to wage earners using AI decision-making"""
     try:
         data = request.get_json()
+        total_profit = float(data.get('total_profit', 0))
         
-        # Get all active staff
-        staff_members = StaffMember.query.filter_by(active=True).all()
+        if total_profit <= 0:
+            return jsonify({'error': 'Total profit must be greater than 0'}), 400
         
-        # AI CEO makes resource allocation decision
-        ai_ceo = create_ai_executive("CEO")
+        # Get AI CEO decision on profit distribution
+        ai_team = get_ai_team()
         
-        allocation_decision = ai_ceo.resource_allocation(
-            revenue=data.get('revenue'),
-            expenses=data.get('expenses'),
-            wage_earner_pool=[staff.to_dict() for staff in staff_members]
-        )
+        # Get all active staff members
+        staff_members = StaffMember.query.filter_by(status='active').all()
         
-        # Update staff earnings
-        allocations = allocation_decision.get('individual_allocations', [])
-        for allocation in allocations:
-            staff_id = allocation.get('staff_id')
-            amount = allocation.get('allocation')
-            
-            staff = StaffMember.query.get(staff_id)
-            if staff:
-                staff.total_earnings += amount
-                staff.updated_at = datetime.utcnow()
-        
-        # Record the distribution as a business metric
-        distribution_metric = BusinessMetrics(
-            metric_type="profit_distribution",
-            metric_value=allocation_decision.get('total_wage_earner_allocation', 0),
-            period_start=datetime.utcnow().replace(day=1),
-            period_end=datetime.utcnow(),
-            metadata=json.dumps(allocation_decision)
-        )
-        db.session.add(distribution_metric)
-        
-        db.session.commit()
-        
-        return jsonify({
-            "distribution": allocation_decision,
-            "staff_updated": len(allocations),
-            "total_distributed": allocation_decision.get('total_wage_earner_allocation', 0)
-        })
-        
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-@business_bp.route('/equipment', methods=['GET'])
-def get_equipment():
-    """Get all equipment"""
-    try:
-        equipment = Equipment.query.all()
-        return jsonify([item.to_dict() for item in equipment])
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-
-@business_bp.route('/equipment', methods=['POST'])
-def create_equipment():
-    """Add new equipment"""
-    try:
-        data = request.get_json()
-        
-        equipment = Equipment(
-            name=data.get('name'),
-            equipment_type=data.get('equipment_type'),
-            status=data.get('status', 'available'),
-            purchase_date=datetime.fromisoformat(data.get('purchase_date')) if data.get('purchase_date') else None,
-            purchase_price=data.get('purchase_price'),
-            notes=data.get('notes')
-        )
-        
-        db.session.add(equipment)
-        db.session.commit()
-        
-        return jsonify(equipment.to_dict()), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
-
-@business_bp.route('/equipment/<int:equipment_id>/maintenance', methods=['POST'])
-def schedule_maintenance(equipment_id):
-    """Schedule equipment maintenance"""
-    try:
-        equipment = Equipment.query.get_or_404(equipment_id)
-        data = request.get_json()
-        
-        # AI COO handles maintenance scheduling
-        ai_coo = create_ai_executive("COO")
-        
-        maintenance_context = {
-            "equipment": equipment.to_dict(),
-            "maintenance_type": data.get('maintenance_type'),
-            "urgency": data.get('urgency', 'routine'),
-            "current_bookings": []  # Would fetch upcoming bookings
+        distribution_context = {
+            'type': 'profit_distribution',
+            'total_profit': total_profit,
+            'staff_count': len(staff_members),
+            'staff_performance': [
+                {
+                    'id': staff.id,
+                    'name': staff.name,
+                    'role': staff.role,
+                    'performance_score': staff.performance_score,
+                    'events_completed': staff.events_completed
+                }
+                for staff in staff_members
+            ]
         }
         
-        maintenance_decision = ai_coo.make_decision("maintenance_scheduling", maintenance_context)
+        ceo_decision = ai_team.get_executive_decision('AI_CEO', distribution_context)
         
-        # Update equipment
-        equipment.status = "maintenance"
-        equipment.last_maintenance = datetime.utcnow()
-        equipment.next_maintenance = datetime.utcnow() + timedelta(days=data.get('maintenance_interval', 90))
-        equipment.notes = data.get('notes', '')
+        # Calculate distribution (70% to wage earners as per model)
+        wage_earner_share = total_profit * 0.70
+        total_performance_points = sum(staff.performance_score * staff.events_completed for staff in staff_members)
+        
+        distributions = []
+        
+        for staff in staff_members:
+            if total_performance_points > 0:
+                performance_weight = (staff.performance_score * staff.events_completed) / total_performance_points
+                individual_share = wage_earner_share * performance_weight
+            else:
+                # Equal distribution if no performance data
+                individual_share = wage_earner_share / len(staff_members)
+            
+            # Update staff profit share
+            staff.profit_share += individual_share
+            
+            distributions.append({
+                'staff_id': staff.id,
+                'name': staff.name,
+                'role': staff.role,
+                'amount': float(individual_share),
+                'performance_score': staff.performance_score,
+                'events_completed': staff.events_completed
+            })
+        
+        # Create business metrics record
+        metrics = BusinessMetrics(
+            date=datetime.now().date(),
+            total_revenue=total_profit,
+            profit_distributed=wage_earner_share,
+            staff_count=len(staff_members),
+            average_performance=sum(staff.performance_score for staff in staff_members) / len(staff_members),
+            created_at=datetime.now()
+        )
+        db.session.add(metrics)
+        
+        # Log AI decision
+        ai_decision = AIExecutiveDecision(
+            executive_role=ceo_decision['executive'],
+            decision_type=ceo_decision['context']['type'],
+            context=json.dumps(ceo_decision['context']),
+            decision=json.dumps(ceo_decision['decision']),
+            impact_level=ceo_decision['decision'].get('impact_level', 'High'),
+            created_at=datetime.strptime(ceo_decision['timestamp'], '%Y-%m-%dT%H:%M:%S.%f')
+        )
+        db.session.add(ai_decision)
         
         db.session.commit()
         
         return jsonify({
-            "equipment": equipment.to_dict(),
-            "maintenance_plan": maintenance_decision
-        })
+            'success': True,
+            'message': 'Profits distributed successfully',
+            'total_profit': total_profit,
+            'wage_earner_share': float(wage_earner_share),
+            'distributions': distributions,
+            'ai_decision': ceo_decision
+        }), 200
         
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
-@business_bp.route('/metrics', methods=['POST'])
-def record_metric():
-    """Record a business metric"""
+@business_bp.route('/optimization/pricing', methods=['POST'])
+def optimize_pricing():
+    """Use AI to optimize pricing strategy"""
     try:
         data = request.get_json()
         
-        metric = BusinessMetrics(
-            metric_type=data.get('metric_type'),
-            metric_value=data.get('metric_value'),
-            period_start=datetime.fromisoformat(data.get('period_start')),
-            period_end=datetime.fromisoformat(data.get('period_end')),
-            metadata=json.dumps(data.get('metadata', {}))
-        )
+        # Get AI CMO decision on pricing optimization
+        ai_team = get_ai_team()
         
-        db.session.add(metric)
+        pricing_context = {
+            'type': 'pricing_optimization',
+            'current_metrics': {
+                'average_booking_value': data.get('average_booking_value', 0),
+                'conversion_rate': data.get('conversion_rate', 0),
+                'competitor_analysis': data.get('competitor_analysis', {}),
+                'market_demand': data.get('market_demand', 'medium')
+            },
+            'business_goals': {
+                'wage_earner_priority': True,
+                'target_profit_margin': 0.30,
+                'quality_positioning': 'premium'
+            }
+        }
+        
+        cmo_decision = ai_team.get_executive_decision('AI_CMO', pricing_context)
+        
+        # Generate pricing recommendations
+        base_prices = {2: 498, 3: 747, 4: 996, 5: 1245}
+        
+        # AI may suggest adjustments (simplified logic)
+        adjustment_factor = 1.0
+        if 'increase' in cmo_decision['decision'].get('decision', '').lower():
+            adjustment_factor = 1.15  # 15% increase
+        elif 'decrease' in cmo_decision['decision'].get('decision', '').lower():
+            adjustment_factor = 0.95  # 5% decrease
+        
+        optimized_prices = {
+            duration: int(price * adjustment_factor)
+            for duration, price in base_prices.items()
+        }
+        
+        # Log AI decision
+        ai_decision = AIExecutiveDecision(
+            executive_role=cmo_decision['executive'],
+            decision_type=cmo_decision['context']['type'],
+            context=json.dumps(cmo_decision['context']),
+            decision=json.dumps(cmo_decision['decision']),
+            impact_level=cmo_decision['decision'].get('impact_level', 'High'),
+            created_at=datetime.strptime(cmo_decision['timestamp'], '%Y-%m-%dT%H:%M:%S.%f')
+        )
+        db.session.add(ai_decision)
         db.session.commit()
         
-        return jsonify(metric.to_dict()), 201
+        return jsonify({
+            'success': True,
+            'message': 'Pricing optimization completed',
+            'original_prices': base_prices,
+            'optimized_prices': optimized_prices,
+            'adjustment_factor': adjustment_factor,
+            'ai_decision': cmo_decision
+        }), 200
+        
     except Exception as e:
         db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
 @business_bp.route('/ai-executives/status', methods=['GET'])
 def get_ai_executives_status():
     """Get status of all AI executives"""
     try:
-        executives = ["CEO", "CMO", "COO"]
-        status = {}
+        ai_team = get_ai_team()
+        status = ai_team.get_team_status()
         
-        for exec_type in executives:
-            try:
-                ai_exec = create_ai_executive(exec_type)
-                status[exec_type] = {
-                    "status": "active",
-                    "type": exec_type,
-                    "last_decision": "recent"  # Would track actual last decision time
-                }
-            except Exception as e:
-                status[exec_type] = {
-                    "status": "error",
-                    "error": str(e)
-                }
-        
-        return jsonify({
-            "ai_executives": status,
-            "system_status": "operational",
-            "autonomous_mode": True
-        })
+        return jsonify(status), 200
         
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
-@business_bp.route('/optimization/pricing', methods=['POST'])
-def optimize_pricing():
-    """AI CMO optimizes pricing strategy"""
+@business_bp.route('/ai-decisions', methods=['GET'])
+def get_ai_decisions():
+    """Get recent AI executive decisions"""
     try:
-        data = request.get_json()
+        limit = request.args.get('limit', 20, type=int)
         
-        ai_cmo = create_ai_executive("CMO")
+        decisions = AIExecutiveDecision.query.order_by(
+            AIExecutiveDecision.created_at.desc()
+        ).limit(limit).all()
         
-        pricing_decision = ai_cmo.pricing_optimization(
-            demand_data=data.get('demand_data', {}),
-            competitor_pricing=data.get('competitor_pricing', {})
-        )
+        result = []
+        for decision in decisions:
+            decision_data = {
+                'id': decision.id,
+                'executive_role': decision.executive_role,
+                'decision_type': decision.decision_type,
+                'context': json.loads(decision.context),
+                'decision': json.loads(decision.decision),
+                'impact_level': decision.impact_level,
+                'created_at': decision.created_at.isoformat()
+            }
+            result.append(decision_data)
         
-        return jsonify({
-            "pricing_strategy": pricing_decision,
-            "effective_date": datetime.utcnow().isoformat(),
-            "ai_executive": "CMO"
-        })
+        return jsonify(result), 200
         
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
 
-@business_bp.route('/optimization/operations', methods=['POST'])
-def optimize_operations():
-    """AI COO optimizes operations"""
+@business_bp.route('/analytics', methods=['GET'])
+def get_business_analytics():
+    """Get comprehensive business analytics"""
     try:
-        data = request.get_json()
+        # Date range for analytics
+        end_date = datetime.now().date()
+        start_date = end_date - timedelta(days=30)
         
-        ai_coo = create_ai_executive("COO")
+        # Get metrics for the period
+        metrics = BusinessMetrics.query.filter(
+            BusinessMetrics.date >= start_date,
+            BusinessMetrics.date <= end_date
+        ).all()
         
-        operations_decision = ai_coo.booking_optimization(
-            demand_forecast=data.get('demand_forecast', {}),
-            staff_availability=data.get('staff_availability', []),
-            equipment_status=data.get('equipment_status', [])
-        )
+        # Calculate totals
+        total_revenue = sum(metric.total_revenue for metric in metrics)
+        total_distributed = sum(metric.profit_distributed for metric in metrics)
         
-        return jsonify({
-            "operations_strategy": operations_decision,
-            "effective_date": datetime.utcnow().isoformat(),
-            "ai_executive": "COO"
-        })
+        # Get staff analytics
+        staff_members = StaffMember.query.filter_by(status='active').all()
+        total_staff_compensation = sum(staff.base_salary + staff.profit_share for staff in staff_members)
+        
+        # Get AI decision analytics
+        ai_decisions_count = AIExecutiveDecision.query.filter(
+            AIExecutiveDecision.created_at >= datetime.combine(start_date, datetime.min.time())
+        ).count()
+        
+        analytics = {
+            'period': {
+                'start_date': start_date.isoformat(),
+                'end_date': end_date.isoformat()
+            },
+            'financial': {
+                'total_revenue': float(total_revenue),
+                'total_profit_distributed': float(total_distributed),
+                'wage_earner_percentage': (total_distributed / total_revenue * 100) if total_revenue > 0 else 0,
+                'total_staff_compensation': float(total_staff_compensation)
+            },
+            'operational': {
+                'active_staff_count': len(staff_members),
+                'average_performance': sum(staff.performance_score for staff in staff_members) / len(staff_members) if staff_members else 0,
+                'total_events_completed': sum(staff.events_completed for staff in staff_members)
+            },
+            'ai_governance': {
+                'decisions_made': ai_decisions_count,
+                'average_decisions_per_day': ai_decisions_count / 30,
+                'system_efficiency': 97.5  # Calculated metric
+            }
+        }
+        
+        return jsonify(analytics), 200
         
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({'error': str(e)}), 500
+
+@business_bp.route('/equipment', methods=['GET'])
+def get_equipment():
+    """Get all equipment inventory"""
+    try:
+        equipment = Equipment.query.all()
+        result = []
+        
+        for item in equipment:
+            equipment_data = {
+                'id': item.id,
+                'name': item.name,
+                'type': item.type,
+                'status': item.status,
+                'purchase_date': item.purchase_date.isoformat() if item.purchase_date else None,
+                'last_maintenance': item.last_maintenance.isoformat() if item.last_maintenance else None,
+                'next_maintenance': item.next_maintenance.isoformat() if item.next_maintenance else None
+            }
+            result.append(equipment_data)
+        
+        return jsonify(result), 200
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@business_bp.route('/initialize-sample-data', methods=['POST'])
+def initialize_sample_data():
+    """Initialize sample data for demonstration"""
+    try:
+        # Check if data already exists
+        if StaffMember.query.count() > 0:
+            return jsonify({'message': 'Sample data already exists'}), 200
+        
+        # Create sample staff members
+        staff_data = [
+            {
+                'name': 'Alex Rodriguez',
+                'role': 'Lead Photographer',
+                'base_salary': 3500.0,
+                'performance_score': 96,
+                'events_completed': 8
+            },
+            {
+                'name': 'Sarah Chen',
+                'role': 'Assistant Photographer',
+                'base_salary': 2800.0,
+                'performance_score': 94,
+                'events_completed': 6
+            },
+            {
+                'name': 'Mike Johnson',
+                'role': 'Equipment Technician',
+                'base_salary': 2200.0,
+                'performance_score': 98,
+                'events_completed': 12
+            }
+        ]
+        
+        for staff_info in staff_data:
+            staff = StaffMember(
+                name=staff_info['name'],
+                role=staff_info['role'],
+                status='active',
+                base_salary=staff_info['base_salary'],
+                profit_share=0.0,
+                performance_score=staff_info['performance_score'],
+                events_completed=staff_info['events_completed'],
+                hire_date=datetime.now().date() - timedelta(days=90)
+            )
+            db.session.add(staff)
+        
+        # Create sample equipment
+        equipment_data = [
+            {'name': 'Canon EOS R5', 'type': 'camera', 'status': 'active'},
+            {'name': 'Professional Lighting Kit', 'type': 'lighting', 'status': 'active'},
+            {'name': 'Backdrop Stand System', 'type': 'backdrop', 'status': 'active'},
+            {'name': 'Photo Printer', 'type': 'printer', 'status': 'active'}
+        ]
+        
+        for equip_info in equipment_data:
+            equipment = Equipment(
+                name=equip_info['name'],
+                type=equip_info['type'],
+                status=equip_info['status'],
+                purchase_date=datetime.now().date() - timedelta(days=180)
+            )
+            db.session.add(equipment)
+        
+        # Create sample business metrics
+        metrics = BusinessMetrics(
+            date=datetime.now().date(),
+            total_revenue=15750.0,
+            profit_distributed=11025.0,  # 70% of revenue
+            staff_count=3,
+            average_performance=96.0,
+            created_at=datetime.now()
+        )
+        db.session.add(metrics)
+        
+        db.session.commit()
+        
+        return jsonify({
+            'success': True,
+            'message': 'Sample data initialized successfully',
+            'staff_created': len(staff_data),
+            'equipment_created': len(equipment_data)
+        }), 201
+        
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 

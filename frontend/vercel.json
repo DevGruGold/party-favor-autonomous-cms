@@ -1,0 +1,17 @@
+{
+  "build": {
+    "commands": [
+      "pnpm install",
+      "pnpm run build"
+    ],
+    "publish": "dist"
+  },
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "destination": "/index.html",
+      "permanent": false
+    }
+  ]
+}
+

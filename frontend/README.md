@@ -20,6 +20,8 @@ This system implements the AI executive governance model described in [A Revolut
 - shadcn/ui components
 - Responsive design for mobile and desktop
 - Real-time dashboard with AI insights
+- Framer Motion animations
+- React Router for navigation
 
 ### Backend (Flask + Python)
 - RESTful API with Flask
@@ -28,7 +30,7 @@ This system implements the AI executive governance model described in [A Revolut
 - Autonomous customer management
 - Transparent profit distribution system
 
-## 🔧 Setup Instructions
+## 🔧 Quick Start
 
 ### Prerequisites
 - Node.js 18+ and pnpm
@@ -37,14 +39,14 @@ This system implements the AI executive governance model described in [A Revolut
 
 ### Frontend Setup
 ```bash
-cd party-favor-autonomous-frontend
+cd party-favor-autonomous-frontend-v2
 pnpm install
 pnpm run dev
 ```
 
 ### Backend Setup
 ```bash
-cd party_favor_autonomous_cms
+cd backend
 python -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -r requirements.txt
@@ -55,8 +57,10 @@ python src/main.py
 ## 🌐 Deployment
 
 ### Frontend (Vercel)
-1. Push to GitHub repository
-2. Connect to Vercel
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/DevGruGold/party-favor-autonomous-cms&project-name=party-favor-autonomous-cms&repository-name=party-favor-autonomous-cms&root-directory=frontend)
+
+1. Click the deploy button above
+2. Connect your GitHub account
 3. Deploy automatically
 
 ### Backend (Railway/Heroku)
@@ -84,7 +88,7 @@ python src/main.py
 - Quality assurance monitoring
 
 ### Wage Earner Priority
-- Transparent profit distribution
+- Transparent profit distribution (70% to workers)
 - Performance-based compensation
 - Worker welfare optimization
 - Skills development investment
@@ -94,6 +98,13 @@ python src/main.py
 - Real-time booking management
 - Premium service quality
 - Transparent business practices
+
+### Modern UI/UX
+- Responsive design for all devices
+- Smooth animations and transitions
+- Intuitive navigation
+- Professional styling with Tailwind CSS
+- Accessible components with shadcn/ui
 
 ## 🔄 API Endpoints
 
@@ -120,6 +131,7 @@ python src/main.py
 3. **Transparent Operations**: All AI decisions are logged and viewable
 4. **Premium Positioning**: Higher prices justified by ethical business model
 5. **Scalable Architecture**: Can be adapted to other service businesses
+6. **Modern Technology Stack**: Built with latest React, Vite, and AI technologies
 
 ## 🔒 Security & Privacy
 
@@ -151,7 +163,7 @@ MIT License - See LICENSE file for details
 
 - [Original Article](https://medium.com/@josephandrewlee/a-revolution-for-wage-earners-212c1bdd6f0f)
 - [Party Favor Photo Website](https://www.partyfavorphoto.com)
-- [Live Demo](https://party-favor-autonomous.vercel.app)
+- [GitHub Repository](https://github.com/DevGruGold/party-favor-autonomous-cms)
 
 ---
 

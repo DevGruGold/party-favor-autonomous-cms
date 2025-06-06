@@ -1,19 +1,41 @@
 {
-  "name": "party-favor-autonomous-frontend",
-  "private": true,
+  "name": "party-favor-autonomous-cms",
   "version": "1.0.0",
-  "type": "module",
+  "description": "Revolutionary photo booth service management system powered by AI executive governance",
+  "homepage": "https://partyfavorphoto.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DevGruGold/party-favor-autonomous-cms.git"
+  },
+  "keywords": [
+    "ai-governance",
+    "autonomous-cms",
+    "photo-booth",
+    "wage-earner-priority",
+    "react",
+    "vite",
+    "tailwindcss"
+  ],
+  "author": "Party Favor Photo AI Executive Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.8",
     "@radix-ui/react-dropdown-menu": "^2.1.8",
     "@radix-ui/react-label": "^2.1.4",
+    "@radix-ui/react-progress": "^1.1.4",
     "@radix-ui/react-select": "^2.1.8",
+    "@radix-ui/react-separator": "^1.1.4",
     "@radix-ui/react-slot": "^1.1.4",
     "@radix-ui/react-tabs": "^1.1.8",
     "class-variance-authority": "^0.7.1",
@@ -39,6 +61,7 @@
     "globals": "^15.14.0",
     "postcss": "^8.5.3",
     "tailwindcss": "^3.5.7",
+    "typescript": "^5.7.2",
     "vite": "^6.0.5"
   }
 }
