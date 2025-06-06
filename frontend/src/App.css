@@ -39,6 +39,14 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+  
+  /* Party Favor Photo Brand Colors */
+  --color-pfp-red: #dc2626;
+  --color-pfp-blue: #2563eb;
+  --color-pfp-green: #16a34a;
+  --color-pfp-orange: #ea580c;
+  --color-pfp-gold: #d97706;
+  --color-pfp-black: #1f2937;
 }
 
 :root {
@@ -118,3 +126,32 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Party Favor Photo Brand Styles */
+.pfp-red { color: var(--color-pfp-red); }
+.pfp-blue { color: var(--color-pfp-blue); }
+.pfp-green { color: var(--color-pfp-green); }
+.pfp-orange { color: var(--color-pfp-orange); }
+.pfp-gold { color: var(--color-pfp-gold); }
+.pfp-black { color: var(--color-pfp-black); }
+
+.bg-pfp-red { background-color: var(--color-pfp-red); }
+.bg-pfp-blue { background-color: var(--color-pfp-blue); }
+.bg-pfp-green { background-color: var(--color-pfp-green); }
+.bg-pfp-orange { background-color: var(--color-pfp-orange); }
+.bg-pfp-gold { background-color: var(--color-pfp-gold); }
+.bg-pfp-black { background-color: var(--color-pfp-black); }
+
+.border-pfp-red { border-color: var(--color-pfp-red); }
+.border-pfp-blue { border-color: var(--color-pfp-blue); }
+.border-pfp-green { border-color: var(--color-pfp-green); }
+.border-pfp-orange { border-color: var(--color-pfp-orange); }
+.border-pfp-gold { border-color: var(--color-pfp-gold); }
+.border-pfp-black { border-color: var(--color-pfp-black); }
+
+.hover\:bg-pfp-red:hover { background-color: var(--color-pfp-red); }
+.hover\:bg-pfp-blue:hover { background-color: var(--color-pfp-blue); }
+.hover\:bg-pfp-green:hover { background-color: var(--color-pfp-green); }
+.hover\:bg-pfp-orange:hover { background-color: var(--color-pfp-orange); }
+.hover\:bg-pfp-gold:hover { background-color: var(--color-pfp-gold); }
+.hover\:bg-pfp-black:hover { background-color: var(--color-pfp-black); }
