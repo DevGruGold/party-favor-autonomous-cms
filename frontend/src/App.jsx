@@ -37,7 +37,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs'
 import { Progress } from './components/ui/progress'
 import { Separator } from './components/ui/separator'
 import { Alert, AlertDescription } from './components/ui/alert'
-import './App.css'
+import './index.css'
 
 // Mock data for demonstration
 const mockData = {

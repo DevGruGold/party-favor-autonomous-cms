@@ -1,12 +1,16 @@
 {
-  "buildCommand": "pnpm run build",
-  "outputDirectory": "dist",
-  "installCommand": "pnpm install",
-  "framework": "vite",
-  "rewrites": [
+  "build": {
+    "commands": [
+      "pnpm install",
+      "pnpm run build"
+    ],
+    "publish": "dist"
+  },
+  "redirects": [
     {
       "source": "/(.*)",
-      "destination": "/index.html"
+      "destination": "/index.html",
+      "permanent": false
     }
   ]
 }
