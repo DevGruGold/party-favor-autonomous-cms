@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from 'react'
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { 
@@ -49,315 +48,274 @@ const mockData = {
   },
   aiExecutives: [
     {
-      id: 'ceo',
-      name: 'AI CEO',
-      role: 'Chief Executive Officer',
-      status: 'ACTIVE',
-      description: 'Strategic planning, resource allocation, and wage earner prioritization',
+      id: 1,
+      role: 'AI CEO',
+      name: 'Strategic Executive',
+      efficiency: 98,
       decisions: 47,
-      efficiency: 98
+      focus: 'Wage Earner Prioritization & Growth Strategy',
+      lastDecision: 'Approved 15% salary increase for all staff',
+      status: 'active'
     },
     {
-      id: 'cmo',
-      name: 'AI CMO',
-      role: 'Chief Marketing Officer',
-      status: 'ACTIVE',
-      description: 'Marketing strategy, pricing optimization, and partnership development',
+      id: 2,
+      role: 'AI CMO',
+      name: 'Marketing Executive',
+      efficiency: 95,
       decisions: 32,
-      efficiency: 95
+      focus: 'Premium Pricing & Brand Positioning',
+      lastDecision: 'Optimized pricing strategy for maximum staff compensation',
+      status: 'active'
     },
     {
-      id: 'coo',
-      name: 'AI COO',
-      role: 'Chief Operations Officer',
-      status: 'ACTIVE',
-      description: 'Operations management, scheduling, and quality assurance',
+      id: 3,
+      role: 'AI COO',
+      name: 'Operations Executive',
+      efficiency: 97,
       decisions: 28,
-      efficiency: 97
+      focus: 'Service Quality & Staff Empowerment',
+      lastDecision: 'Implemented new quality standards for StudioStation',
+      status: 'active'
+    }
+  ],
+  staff: [
+    {
+      id: 1,
+      name: 'Alex Rodriguez',
+      role: 'Lead Photographer',
+      baseSalary: 2850,
+      profitShare: 1200,
+      totalEarnings: 4050,
+      performance: 96,
+      status: 'active'
+    },
+    {
+      id: 2,
+      name: 'Sarah Chen',
+      role: 'Event Coordinator',
+      baseSalary: 2400,
+      profitShare: 950,
+      totalEarnings: 3350,
+      performance: 94,
+      status: 'active'
+    },
+    {
+      id: 3,
+      name: 'Marcus Johnson',
+      role: 'Equipment Specialist',
+      baseSalary: 2200,
+      profitShare: 850,
+      totalEarnings: 3050,
+      performance: 92,
+      status: 'active'
     }
   ],
   recentBookings: [
-    { id: 1, client: 'Sarah & Mike Wedding', date: '2024-06-15', status: 'confirmed', value: 1245 },
-    { id: 2, client: 'TechCorp Annual Party', date: '2024-06-20', status: 'pending', value: 1995 },
-    { id: 3, client: 'Johnson Anniversary', date: '2024-06-25', status: 'confirmed', value: 747 }
+    { id: 1, client: 'Sarah & Mike Wedding', date: '2024-06-15', package: '3hr StudioStation', amount: 747 },
+    { id: 2, client: 'TechCorp Annual Party', date: '2024-06-20', package: '4hr StudioStation', amount: 996 },
+    { id: 3, client: 'Johnson Anniversary', date: '2024-06-25', package: '2hr StudioStation', amount: 498 }
   ]
 }
 
-// Navigation Component
-const Navigation = ({ isMobile, isMenuOpen, setIsMenuOpen }) => {
+// Navigation component with Party Favor Photo branding
+const Navigation = () => {
   const location = useLocation()
   
   const navItems = [
-    { path: '/', label: 'Dashboard', icon: BarChart3 },
-    { path: '/inquiry', label: 'Book Event', icon: Calendar },
-    { path: '/staff', label: 'Staff', icon: Users },
-    { path: '/ai-executives', label: 'AI Executives', icon: Brain },
-    { path: '/about', label: 'About', icon: Star }
+    { path: '/', label: 'Dashboard', icon: BarChart3, color: 'pfp-blue' },
+    { path: '/inquiry', label: 'Book Event', icon: Calendar, color: 'pfp-orange' },
+    { path: '/staff', label: 'Staff', icon: Users, color: 'pfp-green' },
+    { path: '/executives', label: 'AI Executives', icon: Brain, color: 'pfp-red' },
+    { path: '/about', label: 'About', icon: Heart, color: 'pink-500' }
   ]
 
-  const NavContent = () => (
-    <>
-      {navItems.map((item) => {
-        const Icon = item.icon
-        const isActive = location.pathname === item.path
-        
-        return (
-          <Link
-            key={item.path}
-            to={item.path}
-            onClick={() => isMobile && setIsMenuOpen(false)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 ${
-              isActive 
-                ? 'bg-primary text-primary-foreground shadow-md' 
-                : 'hover:bg-accent hover:text-accent-foreground'
-            }`}
-          >
-            <Icon size={18} />
-            <span className="font-medium">{item.label}</span>
-          </Link>
-        )
-      })}
-    </>
-  )
-
-  if (isMobile) {
-    return (
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="absolute top-16 left-0 right-0 bg-card border border-border rounded-lg shadow-lg mx-4 p-4 z-50"
-          >
-            <nav className="flex flex-col gap-2">
-              <NavContent />
-            </nav>
-          </motion.div>
-        )}
-      </AnimatePresence>
-    )
-  }
-
   return (
-    <nav className="hidden md:flex items-center gap-2">
-      <NavContent />
+    <nav className="bg-white shadow-lg border-b-4 border-pfp-gold">
+      <div className="max-w-7xl mx-auto px-4">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo */}
+          <Link to="/" className="flex items-center space-x-3">
+            <div className="relative">
+              <Camera className="h-8 w-8 text-pfp-red" />
+              <div className="absolute -top-1 -right-1 w-3 h-3 bg-pfp-blue rounded-full"></div>
+              <div className="absolute -bottom-1 -left-1 w-2 h-2 bg-pfp-green rounded-full"></div>
+              <div className="absolute top-1 right-2 w-1.5 h-1.5 bg-pfp-orange rounded-full"></div>
+            </div>
+            <div className="text-xl font-bold">
+              <span className="text-pfp-blue">party</span>
+              <span className="text-pfp-green">favor</span>
+              <span className="text-pfp-orange">photo</span>
+            </div>
+          </Link>
+
+          {/* Navigation Links */}
+          <div className="hidden md:flex space-x-1">
+            {navItems.map((item) => {
+              const Icon = item.icon
+              const isActive = location.pathname === item.path
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all duration-200 ${
+                    isActive 
+                      ? `bg-${item.color} text-white shadow-lg` 
+                      : `text-gray-600 hover:bg-${item.color} hover:text-white hover:shadow-md`
+                  }`}
+                >
+                  <Icon className="h-4 w-4" />
+                  <span className="font-medium">{item.label}</span>
+                </Link>
+              )
+            })}
+          </div>
+
+          {/* Contact Info */}
+          <div className="hidden lg:flex items-center space-x-4 text-sm text-gray-600">
+            <div className="flex items-center space-x-1">
+              <Phone className="h-4 w-4 text-pfp-red" />
+              <span>(202) 798-0610</span>
+            </div>
+            <Badge variant="outline" className="text-pfp-gold border-pfp-gold">
+              AI Autonomous
+            </Badge>
+          </div>
+        </div>
+      </div>
     </nav>
   )
 }
 
-// Header Component
-const Header = () => {
-  const [isMobile, setIsMobile] = useState(false)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
-
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768)
-    checkMobile()
-    window.addEventListener('resize', checkMobile)
-    return () => window.removeEventListener('resize', checkMobile)
-  }, [])
-
+// Dashboard component with Party Favor Photo branding
+const Dashboard = () => {
   return (
-    <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2 font-bold text-xl">
-          <Camera className="text-primary" size={24} />
-          <span className="bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
-            Party Favor Photo
-          </span>
-        </Link>
-
-        <Navigation isMobile={isMobile} isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
-
-        <div className="flex items-center gap-2">
-          <Badge variant="outline" className="hidden sm:flex items-center gap-1">
-            <Zap size={12} className="text-green-500" />
-            AI Autonomous
-          </Badge>
-          
-          {isMobile && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="md:hidden"
-            >
-              {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </Button>
-          )}
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pfp-red via-pfp-orange to-pfp-gold text-white p-6 rounded-lg">
+        <h1 className="text-3xl font-bold mb-2">Party Favor Photo - Autonomous CMS</h1>
+        <p className="text-lg opacity-90">AI-Powered Business Management • Wage Earner Prioritization • StudioStation Excellence</p>
+        <div className="mt-4 flex items-center space-x-6">
+          <div className="flex items-center space-x-2">
+            <Sparkles className="h-5 w-5" />
+            <span>Award-Winning Service</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Target className="h-5 w-5" />
+            <span>70% Profit to Staff</span>
+          </div>
+          <div className="flex items-center space-x-2">
+            <Award className="h-5 w-5" />
+            <span>StudioStation Technology</span>
+          </div>
         </div>
       </div>
-    </header>
-  )
-}
 
-// Dashboard Page
-const Dashboard = () => {
-  const [isLoading, setIsLoading] = useState(true)
+      {/* Key Metrics */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="border-l-4 border-pfp-blue">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Monthly Revenue</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-pfp-blue">${mockData.dashboard.revenue.toLocaleString()}</div>
+            <p className="text-xs text-gray-500 mt-1">+12% from last month</p>
+          </CardContent>
+        </Card>
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000)
-    return () => clearTimeout(timer)
-  }, [])
+        <Card className="border-l-4 border-pfp-green">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Active Bookings</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-pfp-green">{mockData.dashboard.bookings}</div>
+            <p className="text-xs text-gray-500 mt-1">StudioStation events</p>
+          </CardContent>
+        </Card>
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full"
-        />
-      </div>
-    )
-  }
+        <Card className="border-l-4 border-pfp-orange">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Customer Rating</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex items-center space-x-2">
+              <div className="text-2xl font-bold text-pfp-orange">{mockData.dashboard.rating}</div>
+              <Star className="h-5 w-5 text-pfp-gold fill-current" />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Based on 127 reviews</p>
+          </CardContent>
+        </Card>
 
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      {/* Hero Section */}
-      <div className="text-center py-8">
-        <motion.h1 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent"
-        >
-          AI Executive Governance Dashboard
-        </motion.h1>
-        <motion.p 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-muted-foreground text-lg max-w-2xl mx-auto"
-        >
-          Revolutionizing business with autonomous AI leadership • Eliminating traditional management overhead • Empowering wage earners
-        </motion.p>
+        <Card className="border-l-4 border-pfp-red">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-gray-600">Staff Members</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-pfp-red">{mockData.dashboard.staff}</div>
+            <p className="text-xs text-gray-500 mt-1">All earning profit share</p>
+          </CardContent>
+        </Card>
       </div>
 
-      {/* AI Executives Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {mockData.aiExecutives.map((executive, index) => (
-          <motion.div
-            key={executive.id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 * (index + 1) }}
-          >
-            <Card className="relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-primary/20 to-transparent rounded-bl-full" />
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <Brain className="text-primary" size={24} />
-                  <Badge variant="secondary" className="text-xs">
-                    {executive.status}
-                  </Badge>
-                </div>
-                <CardTitle className="text-lg">{executive.name}</CardTitle>
-                <CardDescription className="text-sm">{executive.role}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-muted-foreground mb-4">{executive.description}</p>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span>Decisions Made</span>
-                    <span className="font-medium">{executive.decisions}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span>Efficiency</span>
-                    <span className="font-medium">{executive.efficiency}%</span>
-                  </div>
-                  <Progress value={executive.efficiency} className="h-2" />
-                </div>
-              </CardContent>
-            </Card>
-          </motion.div>
-        ))}
-      </div>
-
-      {/* Business Metrics */}
+      {/* AI Executives Overview */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="text-primary" size={20} />
-            Business Dashboard
+          <CardTitle className="flex items-center space-x-2">
+            <Brain className="h-5 w-5 text-pfp-red" />
+            <span>AI Executive Performance</span>
           </CardTitle>
+          <CardDescription>Autonomous decision-making focused on wage earner prioritization</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">${mockData.dashboard.revenue.toLocaleString()}</div>
-              <div className="text-sm text-muted-foreground">Monthly Revenue</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600">{mockData.dashboard.bookings}</div>
-              <div className="text-sm text-muted-foreground">Active Bookings</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-yellow-600">{mockData.dashboard.rating}</div>
-              <div className="text-sm text-muted-foreground">Customer Rating</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-purple-600">{mockData.dashboard.staff}</div>
-              <div className="text-sm text-muted-foreground">Active Staff</div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Action Buttons */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Button className="h-16 flex flex-col gap-1" variant="outline">
-          <Sparkles size={20} />
-          <span className="text-xs">Initialize Sample Data</span>
-        </Button>
-        <Button className="h-16 flex flex-col gap-1" variant="outline">
-          <DollarSign size={20} />
-          <span className="text-xs">Distribute Profits</span>
-        </Button>
-        <Button className="h-16 flex flex-col gap-1" variant="outline">
-          <TrendingUp size={20} />
-          <span className="text-xs">Optimize Pricing</span>
-        </Button>
-        <Button className="h-16 flex flex-col gap-1" variant="outline">
-          <BarChart3 size={20} />
-          <span className="text-xs">View Analytics</span>
-        </Button>
-      </div>
-
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Recent Bookings</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            {mockData.recentBookings.map((booking) => (
-              <div key={booking.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div>
-                  <div className="font-medium">{booking.client}</div>
-                  <div className="text-sm text-muted-foreground">{booking.date}</div>
-                </div>
-                <div className="text-right">
-                  <div className="font-medium">${booking.value}</div>
-                  <Badge variant={booking.status === 'confirmed' ? 'default' : 'secondary'}>
-                    {booking.status}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {mockData.aiExecutives.map((exec) => (
+              <div key={exec.id} className="p-4 border rounded-lg bg-gray-50">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-pfp-black">{exec.role}</h3>
+                  <Badge variant="outline" className="text-pfp-green border-pfp-green">
+                    {exec.efficiency}% Efficient
                   </Badge>
+                </div>
+                <p className="text-sm text-gray-600 mb-2">{exec.focus}</p>
+                <div className="text-xs text-gray-500">
+                  <div>Decisions Made: {exec.decisions}</div>
+                  <div className="mt-1 font-medium">Latest: {exec.lastDecision}</div>
                 </div>
               </div>
             ))}
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+
+      {/* Recent Bookings */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Calendar className="h-5 w-5 text-pfp-orange" />
+            <span>Recent StudioStation Bookings</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {mockData.recentBookings.map((booking) => (
+              <div key={booking.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div>
+                  <div className="font-medium text-pfp-black">{booking.client}</div>
+                  <div className="text-sm text-gray-500">{booking.date}</div>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold text-pfp-green">${booking.amount}</div>
+                  <div className="text-xs text-gray-500">{booking.package}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
-// Event Inquiry Form
+// Event Inquiry Form with Party Favor Photo branding
 const EventInquiry = () => {
   const [formData, setFormData] = useState({
     fullName: '',
@@ -365,76 +323,37 @@ const EventInquiry = () => {
     phone: '',
     eventType: '',
     eventDate: '',
-    duration: '3',
-    venue: '',
+    packageDuration: '3 Hours - $747',
+    venueName: '',
     guestCount: '',
-    backdrop: '',
-    layout: 'horizontal',
-    notes: ''
+    backdropColor: '',
+    photoLayout: 'Horizontal (Traditional)',
+    specialRequests: ''
   })
 
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [submitted, setSubmitted] = useState(false)
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
-    setIsSubmitting(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    setIsSubmitting(false)
-    setSubmitted(true)
+    console.log('Form submitted:', formData)
+    alert('Thank you! Our AI executives will review your inquiry and send a personalized quote within 24 hours.')
   }
 
-  const handleInputChange = (field, value) => {
+  const handleChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
 
-  const packagePrices = {
-    '2': 498,
-    '3': 747,
-    '4': 996,
-    '5': 1245
-  }
-
-  if (submitted) {
-    return (
-      <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="text-center py-12"
-      >
-        <CheckCircle className="mx-auto text-green-500 mb-4" size={64} />
-        <h2 className="text-2xl font-bold mb-4">Inquiry Submitted Successfully!</h2>
-        <p className="text-muted-foreground mb-6">
-          Our AI executives are processing your request. You'll receive a personalized quote within 24 hours.
-        </p>
-        <Button onClick={() => setSubmitted(false)}>
-          Submit Another Inquiry
-        </Button>
-      </motion.div>
-    )
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="max-w-2xl mx-auto"
-    >
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold mb-4">Event Inquiry Form</h1>
-        <p className="text-muted-foreground">
-          Tell us about your event and our AI executives will create a personalized quote for you
-        </p>
+    <div className="max-w-4xl mx-auto space-y-6">
+      {/* Header */}
+      <div className="text-center bg-gradient-to-r from-pfp-blue to-pfp-green text-white p-6 rounded-lg">
+        <h1 className="text-3xl font-bold mb-2">Event Inquiry Form</h1>
+        <p className="text-lg">Tell us about your event and our AI executives will create a personalized quote for you</p>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Camera size={20} />
-            Event Details
+          <CardTitle className="flex items-center space-x-2">
+            <Camera className="h-5 w-5 text-pfp-red" />
+            <span>Event Details</span>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -445,8 +364,9 @@ const EventInquiry = () => {
                 <Input
                   id="fullName"
                   value={formData.fullName}
-                  onChange={(e) => handleInputChange('fullName', e.target.value)}
+                  onChange={(e) => handleChange('fullName', e.target.value)}
                   required
+                  className="border-pfp-gold focus:border-pfp-red"
                 />
               </div>
               <div>
@@ -455,8 +375,9 @@ const EventInquiry = () => {
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  onChange={(e) => handleChange('email', e.target.value)}
                   required
+                  className="border-pfp-gold focus:border-pfp-red"
                 />
               </div>
             </div>
@@ -467,13 +388,14 @@ const EventInquiry = () => {
                 <Input
                   id="phone"
                   value={formData.phone}
-                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  onChange={(e) => handleChange('phone', e.target.value)}
+                  className="border-pfp-gold focus:border-pfp-red"
                 />
               </div>
               <div>
                 <Label htmlFor="eventType">Event Type *</Label>
-                <Select value={formData.eventType} onValueChange={(value) => handleInputChange('eventType', value)}>
-                  <SelectTrigger>
+                <Select value={formData.eventType} onValueChange={(value) => handleChange('eventType', value)}>
+                  <SelectTrigger className="border-pfp-gold focus:border-pfp-red">
                     <SelectValue placeholder="Select event type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -495,21 +417,22 @@ const EventInquiry = () => {
                   id="eventDate"
                   type="date"
                   value={formData.eventDate}
-                  onChange={(e) => handleInputChange('eventDate', e.target.value)}
+                  onChange={(e) => handleChange('eventDate', e.target.value)}
                   required
+                  className="border-pfp-gold focus:border-pfp-red"
                 />
               </div>
               <div>
-                <Label htmlFor="duration">Package Duration *</Label>
-                <Select value={formData.duration} onValueChange={(value) => handleInputChange('duration', value)}>
-                  <SelectTrigger>
+                <Label htmlFor="packageDuration">Package Duration *</Label>
+                <Select value={formData.packageDuration} onValueChange={(value) => handleChange('packageDuration', value)}>
+                  <SelectTrigger className="border-pfp-gold focus:border-pfp-red">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="2">2 Hours - ${packagePrices['2']}</SelectItem>
-                    <SelectItem value="3">3 Hours - ${packagePrices['3']}</SelectItem>
-                    <SelectItem value="4">4 Hours - ${packagePrices['4']}</SelectItem>
-                    <SelectItem value="5">5 Hours - ${packagePrices['5']}</SelectItem>
+                    <SelectItem value="2 Hours - $498">2 Hours - $498</SelectItem>
+                    <SelectItem value="3 Hours - $747">3 Hours - $747</SelectItem>
+                    <SelectItem value="4 Hours - $996">4 Hours - $996</SelectItem>
+                    <SelectItem value="5 Hours - $1245">5 Hours - $1245</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -517,11 +440,12 @@ const EventInquiry = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="venue">Venue Name</Label>
+                <Label htmlFor="venueName">Venue Name</Label>
                 <Input
-                  id="venue"
-                  value={formData.venue}
-                  onChange={(e) => handleInputChange('venue', e.target.value)}
+                  id="venueName"
+                  value={formData.venueName}
+                  onChange={(e) => handleChange('venueName', e.target.value)}
+                  className="border-pfp-gold focus:border-pfp-red"
                 />
               </div>
               <div>
@@ -530,211 +454,165 @@ const EventInquiry = () => {
                   id="guestCount"
                   type="number"
                   value={formData.guestCount}
-                  onChange={(e) => handleInputChange('guestCount', e.target.value)}
+                  onChange={(e) => handleChange('guestCount', e.target.value)}
+                  className="border-pfp-gold focus:border-pfp-red"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="backdrop">Preferred Backdrop Color</Label>
-                <Select value={formData.backdrop} onValueChange={(value) => handleInputChange('backdrop', value)}>
-                  <SelectTrigger>
+                <Label htmlFor="backdropColor">Preferred Backdrop Color</Label>
+                <Select value={formData.backdropColor} onValueChange={(value) => handleChange('backdropColor', value)}>
+                  <SelectTrigger className="border-pfp-gold focus:border-pfp-red">
                     <SelectValue placeholder="Select backdrop color" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="gold">Gold Sequin</SelectItem>
-                    <SelectItem value="silver">Silver Sequin</SelectItem>
-                    <SelectItem value="rose-gold">Rose Gold Sequin</SelectItem>
-                    <SelectItem value="black">Black Sequin</SelectItem>
-                    <SelectItem value="white">White Sequin</SelectItem>
+                    <SelectItem value="gold-sequin">Gold Sequin</SelectItem>
+                    <SelectItem value="silver-sequin">Silver Sequin</SelectItem>
+                    <SelectItem value="rose-gold-sequin">Rose Gold Sequin</SelectItem>
+                    <SelectItem value="black-sequin">Black Sequin</SelectItem>
+                    <SelectItem value="white-sequin">White Sequin</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               <div>
-                <Label htmlFor="layout">Photo Layout</Label>
-                <Select value={formData.layout} onValueChange={(value) => handleInputChange('layout', value)}>
-                  <SelectTrigger>
+                <Label htmlFor="photoLayout">Photo Layout</Label>
+                <Select value={formData.photoLayout} onValueChange={(value) => handleChange('photoLayout', value)}>
+                  <SelectTrigger className="border-pfp-gold focus:border-pfp-red">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="horizontal">Horizontal (Traditional)</SelectItem>
-                    <SelectItem value="vertical">Vertical (Social Media Optimized)</SelectItem>
+                    <SelectItem value="Horizontal (Traditional)">Horizontal (Traditional)</SelectItem>
+                    <SelectItem value="Vertical (Social Media Optimized)">Vertical (Social Media Optimized)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </div>
 
             <div>
-              <Label htmlFor="notes">Special Requests or Notes</Label>
+              <Label htmlFor="specialRequests">Special Requests or Notes</Label>
               <Textarea
-                id="notes"
-                value={formData.notes}
-                onChange={(e) => handleInputChange('notes', e.target.value)}
-                placeholder="Any special requirements, themes, or additional services you'd like to discuss..."
+                id="specialRequests"
+                value={formData.specialRequests}
+                onChange={(e) => handleChange('specialRequests', e.target.value)}
                 rows={4}
+                className="border-pfp-gold focus:border-pfp-red"
               />
             </div>
 
-            {formData.duration && (
-              <Alert>
-                <DollarSign className="h-4 w-4" />
-                <AlertDescription>
-                  Estimated package price: <strong>${packagePrices[formData.duration]}</strong> for {formData.duration} hours
-                </AlertDescription>
-              </Alert>
-            )}
+            {/* Pricing Display */}
+            <div className="bg-pfp-gold/10 border border-pfp-gold rounded-lg p-4">
+              <div className="flex items-center space-x-2 text-pfp-black">
+                <DollarSign className="h-5 w-5" />
+                <span className="font-semibold">Estimated package price:</span>
+              </div>
+              <div className="text-2xl font-bold text-pfp-green mt-1">
+                ${formData.packageDuration.includes('$498') ? '498' : 
+                   formData.packageDuration.includes('$996') ? '996' : 
+                   formData.packageDuration.includes('$1245') ? '1245' : '747'}
+              </div>
+              <div className="text-sm text-gray-600">
+                for {formData.packageDuration.split(' - ')[0] || '3 hours'}
+              </div>
+            </div>
 
-            <Button type="submit" className="w-full" disabled={isSubmitting}>
-              {isSubmitting ? (
-                <>
-                  <motion.div
-                    animate={{ rotate: 360 }}
-                    transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                    className="w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"
-                  />
-                  Processing with AI...
-                </>
-              ) : (
-                <>
-                  Submit Inquiry
-                  <ArrowRight className="ml-2" size={16} />
-                </>
-              )}
+            <Button 
+              type="submit" 
+              className="w-full bg-pfp-red hover:bg-pfp-red/90 text-white py-3 text-lg font-semibold"
+            >
+              Submit Inquiry
+              <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </form>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   )
 }
 
-// Staff Management Page
+// Staff Management with Party Favor Photo branding
 const StaffManagement = () => {
-  const staffMembers = [
-    {
-      id: 1,
-      name: 'Alex Rodriguez',
-      role: 'Lead Photographer',
-      status: 'active',
-      profitShare: 2850,
-      performance: 96,
-      events: 8
-    },
-    {
-      id: 2,
-      name: 'Sarah Chen',
-      role: 'Assistant Photographer',
-      status: 'active',
-      profitShare: 2100,
-      performance: 94,
-      events: 6
-    },
-    {
-      id: 3,
-      name: 'Mike Johnson',
-      role: 'Equipment Technician',
-      status: 'active',
-      profitShare: 1750,
-      performance: 98,
-      events: 12
-    }
-  ]
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">Staff Management</h1>
-        <Badge variant="outline" className="flex items-center gap-1">
-          <Heart size={12} className="text-red-500" />
-          Wage Earner Priority
-        </Badge>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pfp-green to-pfp-blue text-white p-6 rounded-lg">
+        <h1 className="text-3xl font-bold mb-2">Staff Management</h1>
+        <p className="text-lg">Wage Earner Prioritization • 70% Profit Distribution • Transparent Compensation</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Total Profit Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-green-600 mb-2">
-              ${staffMembers.reduce((sum, member) => sum + member.profitShare, 0).toLocaleString()}
-            </div>
-            <p className="text-sm text-muted-foreground">70% of profits distributed to wage earners</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Average Performance</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-blue-600 mb-2">
-              {Math.round(staffMembers.reduce((sum, member) => sum + member.performance, 0) / staffMembers.length)}%
-            </div>
-            <p className="text-sm text-muted-foreground">Team efficiency rating</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-3">
-            <CardTitle className="text-lg">Active Staff</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold text-purple-600 mb-2">
-              {staffMembers.filter(member => member.status === 'active').length}
-            </div>
-            <p className="text-sm text-muted-foreground">Team members</p>
-          </CardContent>
-        </Card>
-      </div>
-
+      {/* Profit Distribution Overview */}
       <Card>
         <CardHeader>
-          <CardTitle>Team Members</CardTitle>
-          <CardDescription>
-            Our AI executives ensure fair compensation and optimal resource allocation for all team members
-          </CardDescription>
+          <CardTitle className="flex items-center space-x-2">
+            <DollarSign className="h-5 w-5 text-pfp-green" />
+            <span>Monthly Profit Distribution</span>
+          </CardTitle>
+          <CardDescription>Revolutionary business model prioritizing wage earners</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="text-center p-4 bg-pfp-green/10 rounded-lg border border-pfp-green">
+              <div className="text-2xl font-bold text-pfp-green">$6,700</div>
+              <div className="text-sm text-gray-600">Total Profit Distribution</div>
+              <div className="text-xs text-gray-500 mt-1">70% to wage earners</div>
+            </div>
+            <div className="text-center p-4 bg-pfp-blue/10 rounded-lg border border-pfp-blue">
+              <div className="text-2xl font-bold text-pfp-blue">$2,867</div>
+              <div className="text-sm text-gray-600">Average per Staff Member</div>
+              <div className="text-xs text-gray-500 mt-1">Base + profit share</div>
+            </div>
+            <div className="text-center p-4 bg-pfp-orange/10 rounded-lg border border-pfp-orange">
+              <div className="text-2xl font-bold text-pfp-orange">94%</div>
+              <div className="text-sm text-gray-600">Staff Satisfaction</div>
+              <div className="text-xs text-gray-500 mt-1">AI-optimized compensation</div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Staff Members */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Users className="h-5 w-5 text-pfp-blue" />
+            <span>Team Members</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {staffMembers.map((member) => (
-              <div key={member.id} className="border rounded-lg p-4">
+            {mockData.staff.map((member) => (
+              <div key={member.id} className="p-4 border rounded-lg bg-gray-50">
                 <div className="flex items-center justify-between mb-3">
                   <div>
-                    <h3 className="font-semibold">{member.name}</h3>
-                    <p className="text-sm text-muted-foreground">{member.role}</p>
+                    <h3 className="font-semibold text-pfp-black">{member.name}</h3>
+                    <p className="text-sm text-gray-600">{member.role}</p>
                   </div>
-                  <Badge variant={member.status === 'active' ? 'default' : 'secondary'}>
-                    {member.status}
+                  <Badge variant="outline" className="text-pfp-green border-pfp-green">
+                    {member.performance}% Performance
                   </Badge>
                 </div>
                 
-                <div className="grid grid-cols-3 gap-4 text-sm">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
                   <div>
-                    <div className="font-medium text-green-600">${member.profitShare.toLocaleString()}</div>
-                    <div className="text-muted-foreground">Monthly Profit Share</div>
-                  </div>
-                  <div>
-                    <div className="font-medium">{member.performance}%</div>
-                    <div className="text-muted-foreground">Performance Score</div>
+                    <div className="text-gray-500">Base Salary</div>
+                    <div className="font-semibold text-pfp-blue">${member.baseSalary}/month</div>
                   </div>
                   <div>
-                    <div className="font-medium">{member.events}</div>
-                    <div className="text-muted-foreground">Events This Month</div>
+                    <div className="text-gray-500">Profit Share</div>
+                    <div className="font-semibold text-pfp-green">+${member.profitShare}</div>
                   </div>
-                </div>
-                
-                <div className="mt-3">
-                  <div className="flex justify-between text-xs mb-1">
-                    <span>Performance</span>
-                    <span>{member.performance}%</span>
+                  <div>
+                    <div className="text-gray-500">Total Earnings</div>
+                    <div className="font-bold text-pfp-red">${member.totalEarnings}/month</div>
                   </div>
-                  <Progress value={member.performance} className="h-2" />
+                  <div>
+                    <div className="text-gray-500">Status</div>
+                    <div className="flex items-center space-x-1">
+                      <CheckCircle className="h-4 w-4 text-pfp-green" />
+                      <span className="text-pfp-green capitalize">{member.status}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}
@@ -742,324 +620,302 @@ const StaffManagement = () => {
         </CardContent>
       </Card>
 
-      <Alert>
-        <Award className="h-4 w-4" />
-        <AlertDescription>
-          <strong>AI Executive Decision:</strong> Profit distribution optimized based on performance metrics and contribution to company success. 
-          All team members receive above-market compensation through our revolutionary wage earner priority model.
-        </AlertDescription>
-      </Alert>
-    </motion.div>
+      {/* AI-Driven Benefits */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Brain className="h-5 w-5 text-pfp-red" />
+            <span>AI-Optimized Benefits</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-semibold text-pfp-black mb-2">Performance Bonuses</h3>
+              <p className="text-sm text-gray-600">AI tracks customer satisfaction and automatically adjusts compensation</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-semibold text-pfp-black mb-2">Skill Development</h3>
+              <p className="text-sm text-gray-600">AI identifies training opportunities and funds professional development</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-semibold text-pfp-black mb-2">Flexible Scheduling</h3>
+              <p className="text-sm text-gray-600">AI optimizes schedules based on staff preferences and business needs</p>
+            </div>
+            <div className="p-4 border rounded-lg">
+              <h3 className="font-semibold text-pfp-black mb-2">Equipment Upgrades</h3>
+              <p className="text-sm text-gray-600">AI prioritizes equipment investments that improve working conditions</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
-// AI Executives Page
+// AI Executives with Party Favor Photo branding
 const AIExecutives = () => {
-  const [selectedExecutive, setSelectedExecutive] = useState('ceo')
-
-  const executiveDetails = {
-    ceo: {
-      decisions: [
-        { id: 1, time: '2 hours ago', decision: 'Approved 15% wage increase for all staff members', impact: 'High' },
-        { id: 2, time: '5 hours ago', decision: 'Optimized resource allocation for upcoming events', impact: 'Medium' },
-        { id: 3, time: '1 day ago', decision: 'Implemented new profit-sharing algorithm', impact: 'High' }
-      ]
-    },
-    cmo: {
-      decisions: [
-        { id: 1, time: '1 hour ago', decision: 'Adjusted pricing strategy for premium packages', impact: 'High' },
-        { id: 2, time: '3 hours ago', decision: 'Launched targeted social media campaign', impact: 'Medium' },
-        { id: 3, time: '6 hours ago', decision: 'Partnered with 3 new wedding venues', impact: 'High' }
-      ]
-    },
-    coo: {
-      decisions: [
-        { id: 1, time: '30 minutes ago', decision: 'Optimized equipment scheduling for weekend events', impact: 'Medium' },
-        { id: 2, time: '2 hours ago', decision: 'Implemented quality assurance checklist', impact: 'High' },
-        { id: 3, time: '4 hours ago', decision: 'Streamlined setup and breakdown procedures', impact: 'Medium' }
-      ]
-    }
-  }
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-6"
-    >
-      <div className="text-center">
-        <h1 className="text-3xl font-bold mb-4">AI Executive Team</h1>
-        <p className="text-muted-foreground max-w-2xl mx-auto">
-          Our autonomous AI executives make data-driven decisions to optimize business operations 
-          while prioritizing wage earner compensation and eliminating traditional management overhead.
-        </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pfp-red to-pfp-orange text-white p-6 rounded-lg">
+        <h1 className="text-3xl font-bold mb-2">AI Executive Team</h1>
+        <p className="text-lg">Autonomous Decision Making • Wage Earner Focus • Transparent Governance</p>
       </div>
 
-      <Tabs value={selectedExecutive} onValueChange={setSelectedExecutive}>
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="ceo">AI CEO</TabsTrigger>
-          <TabsTrigger value="cmo">AI CMO</TabsTrigger>
-          <TabsTrigger value="coo">AI COO</TabsTrigger>
-        </TabsList>
-
-        {mockData.aiExecutives.map((executive) => (
-          <TabsContent key={executive.id} value={executive.id}>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Brain className="text-primary" />
-                    {executive.name}
-                  </CardTitle>
-                  <CardDescription>{executive.role}</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm">{executive.description}</p>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 border rounded-lg">
-                      <div className="text-2xl font-bold text-primary">{executive.decisions}</div>
-                      <div className="text-xs text-muted-foreground">Decisions Made</div>
-                    </div>
-                    <div className="text-center p-3 border rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">{executive.efficiency}%</div>
-                      <div className="text-xs text-muted-foreground">Efficiency Rate</div>
-                    </div>
+      {/* AI Executives */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {mockData.aiExecutives.map((exec) => (
+          <Card key={exec.id} className="border-l-4 border-pfp-red">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span className="text-pfp-black">{exec.role}</span>
+                <Badge variant="outline" className="text-pfp-green border-pfp-green">
+                  {exec.efficiency}% Efficient
+                </Badge>
+              </CardTitle>
+              <CardDescription>{exec.name}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div>
+                  <div className="text-sm text-gray-500">Primary Focus</div>
+                  <div className="font-medium text-pfp-black">{exec.focus}</div>
+                </div>
+                
+                <div>
+                  <div className="text-sm text-gray-500">Decisions Made</div>
+                  <div className="text-2xl font-bold text-pfp-blue">{exec.decisions}</div>
+                </div>
+                
+                <div>
+                  <div className="text-sm text-gray-500">Latest Decision</div>
+                  <div className="text-sm text-pfp-black bg-gray-50 p-2 rounded border-l-2 border-pfp-gold">
+                    {exec.lastDecision}
                   </div>
-
-                  <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span>System Performance</span>
-                      <span>{executive.efficiency}%</span>
-                    </div>
-                    <Progress value={executive.efficiency} className="h-3" />
-                  </div>
-
-                  <Badge variant="outline" className="w-full justify-center">
-                    <CheckCircle size={12} className="mr-1 text-green-500" />
-                    {executive.status}
-                  </Badge>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Recent Decisions</CardTitle>
-                  <CardDescription>Latest autonomous decisions and their business impact</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {executiveDetails[executive.id]?.decisions.map((decision) => (
-                      <div key={decision.id} className="border-l-2 border-primary pl-4 py-2">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-muted-foreground">{decision.time}</span>
-                          <Badge variant={decision.impact === 'High' ? 'default' : 'secondary'} className="text-xs">
-                            {decision.impact} Impact
-                          </Badge>
-                        </div>
-                        <p className="text-sm">{decision.decision}</p>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-pfp-green" />
+                  <span className="text-sm text-pfp-green">Active & Monitoring</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
         ))}
-      </Tabs>
+      </div>
 
-      <Alert>
-        <Brain className="h-4 w-4" />
-        <AlertDescription>
-          <strong>Transparency Notice:</strong> All AI executive decisions are logged and auditable. 
-          Our autonomous governance model ensures consistent focus on wage earner welfare and business optimization.
-        </AlertDescription>
-      </Alert>
-    </motion.div>
+      {/* Decision Log */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <BarChart3 className="h-5 w-5 text-pfp-blue" />
+            <span>Recent AI Decisions</span>
+          </CardTitle>
+          <CardDescription>Transparent decision-making process focused on staff welfare</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {[
+              { time: '2 hours ago', executive: 'AI CEO', decision: 'Approved equipment upgrade budget increase by 25%', impact: 'Positive' },
+              { time: '5 hours ago', executive: 'AI CMO', decision: 'Optimized pricing strategy to increase staff profit share', impact: 'Positive' },
+              { time: '1 day ago', executive: 'AI COO', decision: 'Implemented new quality control measures for StudioStation', impact: 'Positive' },
+              { time: '2 days ago', executive: 'AI CEO', decision: 'Authorized additional training budget for staff development', impact: 'Positive' },
+              { time: '3 days ago', executive: 'AI CMO', decision: 'Launched customer feedback integration system', impact: 'Positive' }
+            ].map((log, index) => (
+              <div key={index} className="flex items-start space-x-3 p-3 border rounded-lg">
+                <div className="flex-shrink-0">
+                  <Brain className="h-5 w-5 text-pfp-red" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-pfp-black">{log.executive}</span>
+                    <span className="text-xs text-gray-500">{log.time}</span>
+                  </div>
+                  <div className="text-sm text-gray-700">{log.decision}</div>
+                  <Badge variant="outline" className="mt-2 text-pfp-green border-pfp-green text-xs">
+                    {log.impact} Impact
+                  </Badge>
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   )
 }
 
-// About Page
+// About page with Party Favor Photo information
 const About = () => {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="space-y-8"
-    >
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">About Party Favor Photo</h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Revolutionizing the photo booth industry through AI executive governance and wage earner prioritization
-        </p>
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-pfp-blue via-pfp-green to-pfp-orange text-white p-6 rounded-lg">
+        <h1 className="text-3xl font-bold mb-2">About Party Favor Photo</h1>
+        <p className="text-lg">Award-Winning StudioStation • AI-Powered Excellence • Wage Earner Revolution</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Target className="text-primary" />
-              Our Mission
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p>
-              Party Favor Photo is pioneering a revolutionary business model that eliminates traditional 
-              executive overhead through AI governance, redirecting those resources directly to our wage earners.
-            </p>
-            <p>
-              Our AI executives - CEO, CMO, and COO - make autonomous decisions focused on maximizing 
-              worker compensation while delivering premium photo booth services to the DMV area.
-            </p>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Heart className="text-red-500" size={16} />
-              <span>70% of profits distributed to wage earners</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Sparkles className="text-primary" />
-              Our Services
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <Camera className="text-primary" size={20} />
-                <div>
-                  <div className="font-medium">Premium Photo Booths</div>
-                  <div className="text-sm text-muted-foreground">High-quality equipment with instant sharing</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Users className="text-primary" size={20} />
-                <div>
-                  <div className="font-medium">Professional Staff</div>
-                  <div className="text-sm text-muted-foreground">Experienced photographers and technicians</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <Settings className="text-primary" size={20} />
-                <div>
-                  <div className="font-medium">Custom Setups</div>
-                  <div className="text-sm text-muted-foreground">Tailored backdrops and layouts</div>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
+      {/* Company Story */}
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Brain className="text-primary" />
-            AI Executive Governance
+          <CardTitle className="flex items-center space-x-2">
+            <Heart className="h-5 w-5 text-pfp-red" />
+            <span>Our Story</span>
           </CardTitle>
-          <CardDescription>
-            How our autonomous leadership model works
-          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-gray-700">
+            Welcome to Party Favor Photo! We have completed our personnel turnover and are back in business with a revolutionary approach to photo booth services in the Washington D.C. area.
+          </p>
+          <p className="text-gray-700">
+            Our flagship <strong className="text-pfp-red">StudioStation Photo Booth</strong> features a real DSLR camera, popping strobe flash, glamorous sequin backdrops, goofy props, and unlimited custom prints. This elegant ballroom service will be the highlight of your party!
+          </p>
+          <p className="text-gray-700">
+            What makes us unique is our <strong className="text-pfp-blue">AI Executive Governance System</strong> that eliminates traditional management overhead and redirects 70% of profits directly to our wage earners, creating the most ethical and sustainable business model in the industry.
+          </p>
+        </CardContent>
+      </Card>
+
+      {/* Services */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Camera className="h-5 w-5 text-pfp-orange" />
+            <span>StudioStation Services</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Brain className="text-primary" size={24} />
-              </div>
-              <h3 className="font-semibold mb-2">AI CEO</h3>
-              <p className="text-sm text-muted-foreground">
-                Strategic planning and resource allocation with wage earner prioritization
-              </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <h3 className="font-semibold text-pfp-black">Equipment Features</h3>
+              <ul className="space-y-2 text-sm text-gray-700">
+                <li className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-pfp-green" />
+                  <span>Real DSLR camera with professional quality</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-pfp-green" />
+                  <span>Popping strobe flash for perfect lighting</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-pfp-green" />
+                  <span>Glamorous sequin backdrops (multiple colors)</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-pfp-green" />
+                  <span>Fun props and accessories</span>
+                </li>
+                <li className="flex items-center space-x-2">
+                  <CheckCircle className="h-4 w-4 text-pfp-green" />
+                  <span>Unlimited custom printing</span>
+                </li>
+              </ul>
             </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <TrendingUp className="text-primary" size={24} />
+            <div className="space-y-4">
+              <h3 className="font-semibold text-pfp-black">Service Packages</h3>
+              <div className="space-y-3">
+                <div className="p-3 border rounded-lg border-pfp-gold">
+                  <div className="font-medium text-pfp-black">2hr StudioStation</div>
+                  <div className="text-sm text-gray-600">3 hours total (includes 1hr setup)</div>
+                  <div className="font-bold text-pfp-green">From $498</div>
+                </div>
+                <div className="p-3 border rounded-lg border-pfp-gold bg-pfp-gold/10">
+                  <div className="font-medium text-pfp-black">3hr StudioStation ⭐ Popular</div>
+                  <div className="text-sm text-gray-600">4 hours total (includes 1hr setup)</div>
+                  <div className="font-bold text-pfp-green">From $747</div>
+                </div>
+                <div className="p-3 border rounded-lg border-pfp-gold">
+                  <div className="font-medium text-pfp-black">4hr StudioStation</div>
+                  <div className="text-sm text-gray-600">5 hours total (includes 1hr setup)</div>
+                  <div className="font-bold text-pfp-green">From $996</div>
+                </div>
               </div>
-              <h3 className="font-semibold mb-2">AI CMO</h3>
-              <p className="text-sm text-muted-foreground">
-                Marketing strategy and pricing optimization for maximum worker benefit
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
-                <Settings className="text-primary" size={24} />
-              </div>
-              <h3 className="font-semibold mb-2">AI COO</h3>
-              <p className="text-sm text-muted-foreground">
-                Operations management and quality assurance automation
-              </p>
             </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Contact Information */}
       <Card>
         <CardHeader>
-          <CardTitle>Contact Information</CardTitle>
+          <CardTitle className="flex items-center space-x-2">
+            <Phone className="h-5 w-5 text-pfp-blue" />
+            <span>Contact Information</span>
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center gap-3">
-              <Phone className="text-primary" size={20} />
-              <div>
-                <div className="font-medium">Phone</div>
-                <div className="text-sm text-muted-foreground">(555) 123-4567</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <Phone className="h-5 w-5 text-pfp-red" />
+                <div>
+                  <div className="font-medium text-pfp-black">Phone</div>
+                  <div className="text-gray-700">(202) 798-0610</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Mail className="h-5 w-5 text-pfp-blue" />
+                <div>
+                  <div className="font-medium text-pfp-black">WhatsApp</div>
+                  <div className="text-gray-700">+50661500559</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <MapPin className="h-5 w-5 text-pfp-green" />
+                <div>
+                  <div className="font-medium text-pfp-black">Service Areas</div>
+                  <div className="text-gray-700">Washington D.C., Texas, Colorado, Florida</div>
+                </div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Mail className="text-primary" size={20} />
-              <div>
-                <div className="font-medium">Email</div>
-                <div className="text-sm text-muted-foreground">info@partyfavorphoto.com</div>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-3">
+                <Clock className="h-5 w-5 text-pfp-orange" />
+                <div>
+                  <div className="font-medium text-pfp-black">Availability</div>
+                  <div className="text-gray-700">Flexible scheduling determined by you</div>
+                </div>
               </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <MapPin className="text-primary" size={20} />
-              <div>
-                <div className="font-medium">Service Area</div>
-                <div className="text-sm text-muted-foreground">DMV Area (DC, MD, VA)</div>
+              <div className="flex items-center space-x-3">
+                <Award className="h-5 w-5 text-pfp-gold" />
+                <div>
+                  <div className="font-medium text-pfp-black">Cancellation Policy</div>
+                  <div className="text-gray-700">We keep a credit for you</div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3">
+                <Sparkles className="h-5 w-5 text-pfp-red" />
+                <div>
+                  <div className="font-medium text-pfp-black">Owner</div>
+                  <div className="text-gray-700">Joe - Direct contact available</div>
+                </div>
               </div>
             </div>
           </div>
         </CardContent>
       </Card>
-    </motion.div>
+    </div>
   )
 }
 
-// Main App Component
+// Main App component
 function App() {
   return (
     <Router>
-      <div className="min-h-screen bg-background">
-        <Header />
-        <main className="container mx-auto px-4 py-8">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/inquiry" element={<EventInquiry />} />
-            <Route path="/staff" element={<StaffManagement />} />
-            <Route path="/ai-executives" element={<AIExecutives />} />
-            <Route path="/about" element={<About />} />
-          </Routes>
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="max-w-7xl mx-auto px-4 py-8">
+          <AnimatePresence mode="wait">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/inquiry" element={<EventInquiry />} />
+              <Route path="/staff" element={<StaffManagement />} />
+              <Route path="/executives" element={<AIExecutives />} />
+              <Route path="/about" element={<About />} />
+            </Routes>
+          </AnimatePresence>
         </main>
-        
-        <footer className="border-t bg-muted/50 py-8 mt-16">
-          <div className="container mx-auto px-4 text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <Camera className="text-primary" size={20} />
-              <span className="font-semibold">Party Favor Photo</span>
-            </div>
-            <p className="text-sm text-muted-foreground mb-2">
-              🚀 Revolutionizing business with AI executive governance
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Eliminating traditional management overhead • Empowering wage earners
-            </p>
-          </div>
-        </footer>
       </div>
     </Router>
   )

@@ -12,6 +12,15 @@ export default {
         sm: "calc(var(--radius) - 4px)",
       },
       colors: {
+        // Party Favor Photo Brand Colors
+        'pfp-red': '#DC2626', // Primary red from logo/camera
+        'pfp-blue': '#2563EB', // Blue from "party" text
+        'pfp-green': '#16A34A', // Green from "favor" text  
+        'pfp-orange': '#EA580C', // Orange from "photo" text
+        'pfp-gold': '#D97706', // Gold from sequin backdrops
+        'pfp-black': '#1F2937', // Professional black
+        
+        // Keep existing shadcn colors for components
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
         card: {
